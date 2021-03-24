@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './styles.css';
 
 const Slides = ({ repeated, slides, children }) => {
@@ -8,6 +8,7 @@ const Slides = ({ repeated, slides, children }) => {
     lastTouch: 0,
     transitionDuration: '0s',
     transitionTimeout: 0,
+    isTouching: false,
   });
   const [width, setWidth] = useState(0);
 
@@ -27,7 +28,36 @@ const Slides = ({ repeated, slides, children }) => {
 
   const SLIDE_WIDTH = width;
 
-  // Creating animated swipe using touch events
+  // Mouse events
+  const handleMouseDown = (e) => {
+    setMainState((prevState) => ({
+      ...prevState,
+      lastTouch: e.pageX,
+      isTouching: true,
+    }));
+  };
+
+  const handleMouseMove = (e) => {
+    if (!mainState.isTouching) return;
+    const delta = mainState.lastTouch - e.pageX;
+    setMainState((prevState) => ({
+      ...prevState,
+      lastTouch: e.pageX,
+    }));
+    handleMovement(delta);
+  };
+
+  const handleMouseLeave = () => {
+    if (!mainState.isTouching) return;
+    handleMovementEnd();
+    setMainState((prevState) => ({
+      ...prevState,
+      lastTouch: 0,
+      isTouching: false,
+    }));
+  };
+
+  // // Creating animated swipe using touch events
   //#region touchFunctions
   const touchStart = (e) => {
     setMainState((prevState) => ({
@@ -62,7 +92,7 @@ const Slides = ({ repeated, slides, children }) => {
       if (nextMove > maxLength * SLIDE_WIDTH) {
         nextMove = 0;
       }
-      return { ...prevState, move: nextMove };
+      return { ...prevState, move: nextMove, transitionTimeout: null };
     });
     setMainState((prevState) => ({ ...prevState, transitionDuration: '0s' }));
   };
@@ -100,19 +130,19 @@ const Slides = ({ repeated, slides, children }) => {
         setMainState((prevState) => ({
           ...prevState,
           transitionDuration: '0s',
+          transitionTimeout: null,
         }));
-      }, duration * 100),
+      }, duration * 1000),
     });
 
     setTimeout(() => {
       repeated.forEach((slide) => {
         if (slide.repeatedID === index) {
-          setMainState({
-            ...mainState,
+          setMainState((prevState) => ({
+            ...prevState,
             index: slide.originalID,
             move: slide.originalID * SLIDE_WIDTH,
-            transitionDuration: '0s',
-          });
+          }));
         }
       });
     }, 1000);
@@ -121,6 +151,10 @@ const Slides = ({ repeated, slides, children }) => {
   useEffect(() => {
     clearTimeout(mainState.transitionTimeout);
   }, []);
+
+  useEffect(() => {
+    console.log(mainState.transitionDuration);
+  }, [mainState.transitionDuration]);
 
   useEffect(() => {
     setMainState({ ...mainState, move: SLIDE_WIDTH });
@@ -132,6 +166,12 @@ const Slides = ({ repeated, slides, children }) => {
       onTouchStart={touchStart}
       onTouchMove={touchMove}
       onTouchEnd={touchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseLeave}
+      onMouseLeave={handleMouseLeave}
+      style={{ userSelect: 'none' }}
+      // ref={mainRef}
     >
       <div
         className="swiper"
@@ -141,7 +181,16 @@ const Slides = ({ repeated, slides, children }) => {
           transitionDuration: mainState.transitionDuration,
         }}
       >
-        {children}
+        {children.map((child) => (
+          <div
+            style={{
+              width: 'inherit',
+              flexShrink: 0,
+            }}
+          >
+            {child}
+          </div>
+        ))}
       </div>
       <button
         className="prev"
@@ -170,13 +219,6 @@ const Slides = ({ repeated, slides, children }) => {
               onClick={() => transition(id, 1)}
             />
           );
-          // id === mainState.index ? (
-          //   <li key={i}>●</li>
-          // ) : (
-          //   <li key={i} onClick={() => transition(id, 1)}>
-          //     ○
-          //   </li>
-          // );
         })}
       </ul>
     </div>

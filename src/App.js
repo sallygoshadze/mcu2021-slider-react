@@ -9,11 +9,22 @@ function App() {
   return (
     <div className="app">
       <Header />
+      {/* Each object in `data` should have an ID property */}
       <Slides repeated={repeated} slides={data}>
         {data.map((slide) => {
           return <Slide key={slide.id} slide={slide} />;
         })}
       </Slides>
+
+      {/* <Slides repeated={repeatedTwo} slides={dataTwo}>
+        {dataTwo.map((slide) => {
+          return (
+            <div key={slide.id}>
+              <p>testes {slide.id}</p>
+            </div>
+          );
+        })}
+      </Slides> */}
     </div>
   );
 }
