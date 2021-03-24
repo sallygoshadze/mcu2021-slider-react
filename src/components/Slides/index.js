@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FiChevronRight, FiChevronLeft, FiCircle } from 'react-icons/fi';
-import { BsFillCircleFill } from 'react-icons/bs';
+import './styles.css';
 
 const Slides = ({ repeated, slides, children }) => {
   const [mainState, setMainState] = useState({
@@ -150,7 +149,7 @@ const Slides = ({ repeated, slides, children }) => {
           transition(mainState.index - 1, 1);
         }}
       >
-        <FiChevronLeft />
+        ←
       </button>
       <button
         className="next"
@@ -158,17 +157,26 @@ const Slides = ({ repeated, slides, children }) => {
           transition(mainState.index + 1, 1);
         }}
       >
-        <FiChevronRight />
+        →
       </button>
 
       <ul>
         {slides.slice(1, slides.length - 1).map((slide, i) => {
           const { id } = slide;
-          return id === mainState.index ? (
-            <BsFillCircleFill key={i} />
-          ) : (
-            <FiCircle key={i} onClick={() => transition(id, 1)} />
+          return (
+            <li
+              key={i}
+              className={id === mainState.index ? 'dots filled' : 'dots'}
+              onClick={() => transition(id, 1)}
+            />
           );
+          // id === mainState.index ? (
+          //   <li key={i}>●</li>
+          // ) : (
+          //   <li key={i} onClick={() => transition(id, 1)}>
+          //     ○
+          //   </li>
+          // );
         })}
       </ul>
     </div>

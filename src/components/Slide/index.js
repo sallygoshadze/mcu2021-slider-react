@@ -1,5 +1,5 @@
 import React from 'react';
-import { BiLinkExternal } from 'react-icons/bi';
+import './styles.css';
 
 const Slide = ({ slide }) => {
   const { image, type, date, title, cast, details, url } = slide;
@@ -14,9 +14,6 @@ const Slide = ({ slide }) => {
         <div>
           <a href={url} target="_blank">
             {title}
-            <sup>
-              <BiLinkExternal />
-            </sup>
           </a>
           <h3>{type}</h3>
         </div>
