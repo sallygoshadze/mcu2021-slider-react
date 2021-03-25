@@ -8,7 +8,7 @@ const Slides = ({ repeated, slides, children }) => {
     lastTouch: 0,
     transitionDuration: '0s',
     transitionTimeout: 0,
-    isTouching: false,
+    clicked: false,
   });
   const [width, setWidth] = useState(0);
 
@@ -33,12 +33,12 @@ const Slides = ({ repeated, slides, children }) => {
     setMainState((prevState) => ({
       ...prevState,
       lastTouch: e.pageX,
-      isTouching: true,
+      clicked: true,
     }));
   };
 
   const handleMouseMove = (e) => {
-    if (!mainState.isTouching) return;
+    if (!mainState.clicked) return;
     const delta = mainState.lastTouch - e.pageX;
     setMainState((prevState) => ({
       ...prevState,
@@ -48,12 +48,12 @@ const Slides = ({ repeated, slides, children }) => {
   };
 
   const handleMouseLeave = () => {
-    if (!mainState.isTouching) return;
+    if (!mainState.clicked) return;
     handleMovementEnd();
     setMainState((prevState) => ({
       ...prevState,
       lastTouch: 0,
-      isTouching: false,
+      clicked: false,
     }));
   };
 
@@ -157,7 +157,10 @@ const Slides = ({ repeated, slides, children }) => {
   }, [mainState.transitionDuration]);
 
   useEffect(() => {
-    setMainState({ ...mainState, move: SLIDE_WIDTH });
+    setMainState((prevState) => ({
+      ...prevState,
+      move: SLIDE_WIDTH * prevState.index,
+    }));
   }, [SLIDE_WIDTH]);
 
   return (
@@ -171,7 +174,6 @@ const Slides = ({ repeated, slides, children }) => {
       onMouseUp={handleMouseLeave}
       onMouseLeave={handleMouseLeave}
       style={{ userSelect: 'none' }}
-      // ref={mainRef}
     >
       <div
         className="swiper"
