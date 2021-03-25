@@ -4,6 +4,7 @@ import './styles.css';
 const Slides = ({ repeated, slides, children }) => {
   const [mainState, setMainState] = useState({
     index: 1,
+    dotsIndex: 1,
     move: 0,
     lastTouch: 0,
     transitionDuration: '0s',
@@ -28,7 +29,8 @@ const Slides = ({ repeated, slides, children }) => {
 
   const SLIDE_WIDTH = width;
 
-  // Mouse events
+  // Click and drag effect with mouse events
+  //#region mouseEvents
   const handleMouseDown = (e) => {
     setMainState((prevState) => ({
       ...prevState,
@@ -56,8 +58,9 @@ const Slides = ({ repeated, slides, children }) => {
       clicked: false,
     }));
   };
+  //#endregion
 
-  // // Creating animated swipe using touch events
+  // Creating animated swipe using touch events
   //#region touchFunctions
   const touchStart = (e) => {
     setMainState((prevState) => ({
@@ -121,9 +124,16 @@ const Slides = ({ repeated, slides, children }) => {
   //#endregion
 
   const transition = (index, duration) => {
+    let dotsIndex = index;
+    for (let slide of repeated) {
+      if (slide.repeatedID === index) {
+        dotsIndex = slide.originalID;
+      }
+    }
     setMainState({
       ...mainState,
       index: index,
+      dotsIndex: dotsIndex,
       transitionDuration: `${duration}s`,
       move: index * SLIDE_WIDTH,
       transitionTimeout: setTimeout(() => {
@@ -136,7 +146,7 @@ const Slides = ({ repeated, slides, children }) => {
     });
 
     setTimeout(() => {
-      repeated.forEach((slide) => {
+      for (let slide of repeated) {
         if (slide.repeatedID === index) {
           setMainState((prevState) => ({
             ...prevState,
@@ -144,7 +154,7 @@ const Slides = ({ repeated, slides, children }) => {
             move: slide.originalID * SLIDE_WIDTH,
           }));
         }
-      });
+      }
     }, 1000);
   };
 
@@ -183,12 +193,13 @@ const Slides = ({ repeated, slides, children }) => {
           transitionDuration: mainState.transitionDuration,
         }}
       >
-        {children.map((child) => (
+        {children.map((child, i) => (
           <div
             style={{
               width: 'inherit',
               flexShrink: 0,
             }}
+            key={i}
           >
             {child}
           </div>
@@ -217,7 +228,7 @@ const Slides = ({ repeated, slides, children }) => {
           return (
             <li
               key={i}
-              className={id === mainState.index ? 'dots filled' : 'dots'}
+              className={id === mainState.dotsIndex ? 'dots filled' : 'dots'}
               onClick={() => transition(id, 1)}
             />
           );
