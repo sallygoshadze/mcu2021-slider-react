@@ -163,10 +163,6 @@ const Slides = ({ repeated, slides, children }) => {
   }, []);
 
   useEffect(() => {
-    console.log(mainState.transitionDuration);
-  }, [mainState.transitionDuration]);
-
-  useEffect(() => {
     setMainState((prevState) => ({
       ...prevState,
       move: SLIDE_WIDTH * prevState.index,

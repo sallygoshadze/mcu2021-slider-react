@@ -2,7 +2,6 @@
 
 This project was created with Webpack and React hooks.
 
-View the project [live](https://mcu2021-slider-sallygoshadze.netlify.app/)
 
 ## Features
 
